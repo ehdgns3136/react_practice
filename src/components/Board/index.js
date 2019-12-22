@@ -1,36 +1,25 @@
 import React from 'react';
-import Square from './Square'
-import '../Component.css'
+import Square from '../Square'
+import '../../global/styles/index.css'
+import PropTypes from "prop-types";
 
 class Board extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            squares: Array(9).fill(null),
-            xIsNext: true,
-        };
-    }
-
     handleClick(i) {
-        const squares = this.state.squares.slice();
-        if (this.calculateWinner(squares) || squares[i]) {
+        if (this.calculateWinner() || this.props.squares[i]) {
             return;
         }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
-        this.setState({
-            squares: squares,
-            xIsNext: !this.state.xIsNext,
-        });
+        this.props.onClickSquare(i);
     }
 
     renderSquare(i) {
         return <Square
-            value={this.state.squares[i]}
+            value={this.props.squares[i]}
             onClick={() => this.handleClick(i)}
         />;
     }
 
-    calculateWinner(squares) {
+    calculateWinner() {
+        const squares = this.props.squares;
         const lines = [
             [0, 1, 2],
             [3, 4, 5],
@@ -51,12 +40,12 @@ class Board extends React.Component {
     }
 
     render() {
-        const winner = this.calculateWinner(this.state.squares);
+        const winner = this.calculateWinner();
         let status;
         if (winner) {
             status = 'Winner: ' + winner;
         } else {
-            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+            status = 'Next player: ' + (this.props.xIsNext ? 'X' : 'O');
         }
 
         return (
@@ -81,5 +70,11 @@ class Board extends React.Component {
         );
     }
 }
+
+Board.propTypes = {
+    onClickSquare: PropTypes.func.isRequired,
+    squares: PropTypes.arrayOf(PropTypes.string).isRequired,
+    xIsNext: PropTypes.bool.isRequired,
+};
 
 export default Board
